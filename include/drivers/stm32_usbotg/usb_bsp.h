@@ -22,7 +22,9 @@
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __USB_BSP__H__
 #define __USB_BSP__H__
-
+#ifdef __cplusplus
+  extern "C" {
+#endif
 /* Includes ------------------------------------------------------------------*/
 #include "usb_core.h"
 
@@ -86,7 +88,9 @@ void USB_OTG_BSP_Suspend(USB_OTG_CORE_HANDLE *pdev);
 /**
   * @}
   */ 
-
+#ifdef __cplusplus
+  }
+#endif
 #endif /* __USB_BSP__H__ */
 
 /**

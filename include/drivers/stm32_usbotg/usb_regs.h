@@ -22,7 +22,9 @@
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef USB_REGS_H
 #define USB_REGS_H
-
+#ifdef __cplusplus
+  extern "C" {
+#endif
 /* Includes ------------------------------------------------------------------*/
 #include "usb_conf.h"
 
@@ -1195,7 +1197,9 @@ uint32_t Reserved5_31 :
   * @}
   */ 
 
-
+#ifdef __cplusplus
+  }
+#endif
 #endif /* USB_REGS_H */
 
 

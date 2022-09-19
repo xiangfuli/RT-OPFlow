@@ -21,9 +21,11 @@
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 
-#ifndef __USBD_DEF_H
-#define __USBD_DEF_H
-
+#ifndef USBD_DEF_H
+#define USBD_DEF_H
+#ifdef __cplusplus
+  extern "C" {
+#endif
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_conf.h"
 
@@ -137,8 +139,10 @@
 /**
   * @}
   */ 
-
-#endif /* __USBD_DEF_H */
+#ifdef __cplusplus
+  }
+#endif
+#endif /* USBD_DEF_H */
 
 /**
   * @}

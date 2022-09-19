@@ -132,7 +132,7 @@ void USBD_Init(USB_OTG_CORE_HANDLE *pdev,
                USBD_Usr_cb_TypeDef *usr_cb)
 {
   /* Hardware Init */
-  USB_OTG_BSP_Init(pdev);  
+  USB_OTG_BSP_Init(pdev);
   
   USBD_DeInit(pdev);
   

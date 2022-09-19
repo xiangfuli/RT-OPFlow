@@ -22,7 +22,9 @@
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef USB_CORE_H
 #define USB_CORE_H
-
+#ifdef __cplusplus
+  extern "C" {
+#endif
 /* Includes ------------------------------------------------------------------*/
 #include "usb_conf.h"
 #include "usb_regs.h"
@@ -390,7 +392,9 @@ uint32_t     USB_OTG_GetEPStatus(USB_OTG_CORE_HANDLE *pdev ,USB_OTG_EP *ep);
 /**
   * @}
   */ 
-
+#ifdef __cplusplus
+  }
+#endif
 #endif /* USB_CORE_H */
 
 

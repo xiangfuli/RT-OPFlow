@@ -22,7 +22,9 @@
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef USB_DCD_H
 #define USB_DCD_H
-
+#ifdef __cplusplus
+  extern "C" {
+#endif
 /* Includes ------------------------------------------------------------------*/
 #include "usb_core.h"
 
@@ -143,7 +145,9 @@ void DCD_SetEPStatus (USB_OTG_CORE_HANDLE *pdev ,
 * @}
 */ 
 
-
+#ifdef __cplusplus
+  }
+#endif
 #endif /* USB_DCD_H */
 
 

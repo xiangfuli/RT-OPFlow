@@ -22,12 +22,11 @@
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __USBD_USR_H__
 #define __USBD_USR_H__
-
+#ifdef __cplusplus
+  extern "C" {
+#endif
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_ioreq.h"
-#if ! defined (USE_STM32446_EVAL) && ! defined (USE_STM32469I_EVAL)
-#include "lcd_log.h"
-#endif
 /** @addtogroup USBD_USER
   * @{
   */
@@ -114,7 +113,9 @@ void     USBD_USR_HS_DeviceDisconnected(void);
 /**
   * @}
   */ 
-
+#ifdef __cplusplus
+  }
+#endif
 #endif /*__USBD_USR_H__*/
 
 /**

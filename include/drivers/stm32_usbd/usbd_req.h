@@ -23,7 +23,9 @@
 
 #ifndef USBD_REQ_H
 #define USBD_REQ_H
-
+#ifdef __cplusplus
+  extern "C" {
+#endif
 /* Includes ------------------------------------------------------------------*/
 #include  "usbd_def.h"
 #include  "usbd_core.h"
@@ -87,7 +89,9 @@ void USBD_GetString(uint8_t *desc, uint8_t *unicode, uint16_t *len);
 /**
   * @}
   */ 
-
+#ifdef __cplusplus
+  }
+#endif
 #endif /* USBD_REQ_H */
 
 /**

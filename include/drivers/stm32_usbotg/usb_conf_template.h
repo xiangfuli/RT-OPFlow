@@ -22,7 +22,9 @@
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __USB_CONF__H__
 #define __USB_CONF__H__
-
+#ifdef __cplusplus
+  extern "C" {
+#endif
 /* Includes ------------------------------------------------------------------*/
 #include "usb_conf.h"
 
@@ -203,7 +205,7 @@
 #ifndef USE_DEVICE_MODE
  #ifndef USE_HOST_MODE
     #error  "USE_DEVICE_MODE or USE_HOST_MODE should be defined"
- #endif
+ #endif``
 #endif
 
 #ifndef USE_USB_OTG_HS
@@ -281,7 +283,9 @@
   * @}
   */ 
 
-
+#ifdef __cplusplus
+  }
+#endif
 #endif //__USB_CONF__H__
 
 

@@ -2,10 +2,12 @@
 #define USB_CONF_H
 
 #include "stm32f4xx.h"
-
+#ifdef __cplusplus
+  extern "C" {
+#endif
+#define USE_USB_OTG_FS
 #define USB_OTG_FS_CORE
 #define USE_DEVICE_MODE
-#define VBUS_SENSING_ENABLED
 
 #define RX_FIFO_FS_SIZE                          128
 #define TX0_FIFO_FS_SIZE                          64
@@ -42,5 +44,7 @@
 #elif defined   (__TASKING__)  /* TASKING Compiler */
   #define __packed    __unaligned
 #endif /* __CC_ARM */
-
+#ifdef __cplusplus
+    }
+#endif
 #endif /* USB_CONF_H */

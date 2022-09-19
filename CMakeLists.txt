@@ -56,9 +56,10 @@ include_directories(
 )
 
 file(GLOB_RECURSE SOURCES
-        "include/**"
         "src/**"
         )
+
+message("${SOURCES}")
 
 add_definitions(-DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -DARM_MATH_CM4 -D__VFP_FP__ -D__GNUC__)
 

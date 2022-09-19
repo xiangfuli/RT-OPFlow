@@ -30,10 +30,10 @@
 #define USBD_MANUFACTURER_STRING        "Robot Tinker"
 
 #define USBD_PRODUCT_HS_STRING          "RT OPFlow vAlpha"
-#define USBD_SERIALNUMBER_HS_STRING     "000000000000"
+#define USBD_SERIALNUMBER_HS_STRING     "8J39XBS6AMWS"
 
 #define USBD_PRODUCT_FS_STRING          "RT OPFlow vAlpha"
-#define USBD_SERIALNUMBER_FS_STRING     "000000000000"
+#define USBD_SERIALNUMBER_FS_STRING     "8J39XBS6AMWS"
 
 #define USBD_CONFIGURATION_HS_STRING    "VCP Config"
 #define USBD_INTERFACE_HS_STRING        "VCP Interface"
@@ -51,6 +51,12 @@ USBD_DEVICE USR_desc =
 	USBD_USR_ConfigStrDescriptor,
 	USBD_USR_InterfaceStrDescriptor,
 };
+
+uint8_t USBD_DeviceDesc  [USB_SIZ_DEVICE_DESC];
+uint8_t USBD_StrDesc[USB_MAX_STR_DESC_SIZ];
+uint8_t USBD_OtherSpeedCfgDesc[USB_LEN_CFG_DESC]; 
+uint8_t USBD_DeviceQualifierDesc[USB_LEN_DEV_QUALIFIER_DESC];
+uint8_t USBD_LangIDDesc[USB_SIZ_STRING_LANGID];
 
 /* USB Standard Device Descriptor */
 __ALIGN_BEGIN uint8_t USBD_DeviceDesc[USB_SIZ_DEVICE_DESC] __ALIGN_END =
@@ -219,3 +225,5 @@ uint8_t *  USBD_USR_InterfaceStrDescriptor( uint8_t speed , uint16_t *length)
 	}
 	return USBD_StrDesc;
 }
+
+

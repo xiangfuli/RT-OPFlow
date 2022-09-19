@@ -23,6 +23,9 @@
 #ifndef USBD_CORE_H
 #define USBD_CORE_H
 
+#ifdef __cplusplus
+  extern "C" {
+#endif
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx.h"
 #include "usb_dcd.h"
@@ -83,6 +86,7 @@ typedef enum {
 /** @defgroup USBD_CORE_Exported_FunctionsPrototype
   * @{
   */ 
+
 void USBD_Init(USB_OTG_CORE_HANDLE *pdev,
                USB_OTG_CORE_ID_TypeDef coreID, 
                USBD_DEVICE *pDevice,                  
@@ -98,6 +102,10 @@ USBD_Status USBD_SetCfg(USB_OTG_CORE_HANDLE  *pdev, uint8_t cfgidx);
 /**
   * @}
   */ 
+
+#ifdef __cplusplus
+  }
+#endif
 
 #endif /* USBD_CORE_H */
 

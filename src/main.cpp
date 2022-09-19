@@ -1,4 +1,6 @@
-#include "main.h"
+#include "main.hpp"
+
+__ALIGN_BEGIN USB_OTG_CORE_HANDLE  USB_OTG_dev __ALIGN_END;
 
 void *operator new(size_t size) {
     return pvPortMalloc(size);
@@ -20,14 +22,21 @@ void pvFCSTaskPowerLEDBlink(void *pvParameters) {
 	while(1) {
 		GPIO_WriteBit(GPIOD, GPIO_Pin_11, BitAction(bit));
 		bit = !bit;
-        vTaskDelay(pdMS_TO_TICKS(1000));
+        vTaskDelay(pdMS_TO_TICKS(500));
 	}
 }
 
 int main(int ac, char** av) {
 		SystemInit();
-		SystemCoreClockUpdate();
     xTaskCreate(pvFCSTaskPowerLEDBlink, "pvFCSTaskPowerLEDBlink", configMINIMAL_STACK_SIZE, NULL, configMAX_PRIORITIES, NULL);
+
+		/* init usb */
+		USBD_Init(&USB_OTG_dev,
+					USB_OTG_FS_CORE_ID,
+					&USR_desc,
+					&USBD_CDC_cb,
+					&USR_cb);
+
     vTaskStartScheduler();
 
     SensorsManager sensors_manager;

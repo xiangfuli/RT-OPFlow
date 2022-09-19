@@ -5,6 +5,11 @@
 #include "stm32f4xx_gpio.h"
 #include "FreeRTOS.h"
 #include "task.h"
+#include "usbd_core.h"
+#include "usbd_cdc_core.h"
+#include "usbd_desc.h"
+#include "usbd_cdc_vcp.h"
+#include "usbd_usr.h"
 
 #include "SensorsManager.hpp"
 

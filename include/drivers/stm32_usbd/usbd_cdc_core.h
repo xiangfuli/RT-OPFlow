@@ -21,8 +21,12 @@
 
 /* Includes ------------------------------------------------------------------*/
 
-#ifndef __USB_CDC_CORE_H_
-#define __USB_CDC_CORE_H_
+#ifndef USBD_CDC_CORE_H
+#define USBD_CDC_CORE_H
+
+#ifdef __cplusplus
+  extern "C" {
+#endif
 
 #include  "usbd_ioreq.h"
 
@@ -123,7 +127,11 @@ extern USBD_Class_cb_TypeDef  USBD_CDC_cb;
   * @}
   */ 
 
-#endif /* __USB_CDC_CORE_H_ */
+#ifdef __cplusplus
+  }
+#endif
+
+#endif /* USBD_CDC_CORE_H */
 /**
   * @}
   */ 
