@@ -35,8 +35,8 @@
    ---------------------------------------------------------------------------*/
 
 
-#ifndef __CORE_CMINSTR_H
-#define __CORE_CMINSTR_H
+#ifndef CORE_CMINSTR_H
+#define CORE_CMINSTR_H
 
 
 /* ##########################  Core Instruction Access  ######################### */
@@ -913,4 +913,4 @@ __attribute__((always_inline)) __STATIC_INLINE void __STRT(uint32_t value, volat
 
 /*@}*/ /* end of group CMSIS_Core_InstructionInterface */
 
-#endif /* __CORE_CMINSTR_H */
+#endif /* CORE_CMINSTR_H */

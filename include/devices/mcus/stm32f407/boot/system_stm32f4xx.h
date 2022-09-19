@@ -30,8 +30,7 @@
   * @brief Define to prevent recursive inclusion
   */
 
-#ifndef SYSTEM_STM32F4XX_H
-#define SYSTEM_STM32F4XX_H
+
 #ifndef SYSTEM_STM32F4XX_H
 #define SYSTEM_STM32F4XX_H
 
@@ -98,6 +97,3 @@ extern void SystemCoreClockUpdate(void);
 /**
   * @}
   */  
-
-
-#endif /* SYSTEM_STM32F4XX_H */

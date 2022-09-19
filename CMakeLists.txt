@@ -40,27 +40,27 @@ endif ()
 include_directories(
     include
     include/commons
-    include/devices/STM32F407/boot
-    include/devices/STM32F407/freeRTOS_port
-    include/devices/STM32F407/std_libs
+    include/devices/boards
+    include/devices/boards/rt-opflow-v1
+    include/devices/mcus/STM32F407/boot
+    include/devices/mcus/STM32F407/freeRTOS_port
+    include/devices/mcus/STM32F407/std_libs
     include/drivers
+    include/drivers/stm32_usbd
+    include/drivers/stm32_usbotg
     include/DSP_libs
     include/freeRTOS
     include/system
+    include/system/usb
     include/system/sensors
 )
 
 file(GLOB_RECURSE SOURCES
-        "src/devices/stm32f407/boot/*.*"
-        "src/devices/stm32f407/freeRTOS_port/*.*"
-        "src/devices/stm32f407/std_libs/*.*"
-        "src/DSP_libs/*.*"
-        "src/freeRTOS/*.*"
-        "src/system/sensors/*.*"
-        "src/*.*"
+        "include/**"
+        "src/**"
         )
 
-add_definitions(-DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -DARM_MATH_CM4)
+add_definitions(-DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -DARM_MATH_CM4 -D__VFP_FP__ -D__GNUC__)
 
 SET(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/STM32F407VGTx_FLASH.ld)
 
@@ -90,6 +90,11 @@ add_compile_definitions(USE_STDPERIPH_DRIVER)
 
 # specify chip selection
 add_compile_definitions(STM32F40_41xxx)
+
+# specify compiler target
+add_compile_definitions(__GNUC__)
+
+add_compile_definitions(D__VFP_FP__)
 
 add_executable(${PROJECT_NAME}.elf ${SOURCES} ${LINKER_SCRIPT})
 
