@@ -97,8 +97,7 @@ void USB_OTG_BSP_uDelay (const uint32_t usec)
 		{
 			return ;
 		}
-	}
-	while (1);
+	} while (1);
 }
 
 
