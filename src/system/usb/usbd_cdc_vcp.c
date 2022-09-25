@@ -50,10 +50,10 @@ extern uint32_t APP_Rx_ptr_in;    /* Increment this pointer or roll it back to
                                      in the buffer APP_Rx_Buffer. */
 
 /* Driver TX buffer */
-#define APP_TX_BUF_SIZE 128
-uint8_t APP_Tx_Buffer[APP_TX_BUF_SIZE] __attribute__((section(".ccmram")));
-uint32_t APP_tx_ptr_head;
-uint32_t APP_tx_ptr_tail;
+#define APP_TX_BUF_SIZE 128*16
+uint8_t APP_Tx_Buffer[APP_TX_BUF_SIZE];
+uint32_t APP_tx_ptr_head = 0;
+uint32_t APP_tx_ptr_tail = 0;
 
 static uint16_t VCP_Init     (void);
 static uint16_t VCP_DeInit   (void);
@@ -163,7 +163,7 @@ static uint16_t VCP_DataTx (uint8_t* Buf, uint32_t Len)
 	{
 		APP_Rx_Buffer[APP_Rx_ptr_in] = *(Buf + i);
 		APP_Rx_ptr_in++;
-  		i++;
+  	i++;
 
 		/* To avoid buffer overflow */
 		if(APP_Rx_ptr_in == APP_RX_DATA_SIZE)
@@ -232,8 +232,6 @@ static uint16_t VCP_DataRx (uint8_t* Buf, uint32_t Len)
 		if(APP_tx_ptr_head == APP_tx_ptr_tail)
 			return USBD_FAIL;
 	}
-
-  VCP_DataTx(Buf, Len);
 
 	return USBD_OK;
 }
