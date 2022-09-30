@@ -20,8 +20,8 @@
   */ 
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __USBD_USR_H__
-#define __USBD_USR_H__
+#ifndef USBD_USR_H
+#define USBD_USR_H
 #ifdef __cplusplus
   extern "C" {
 #endif
@@ -115,7 +115,7 @@ void     USBD_USR_HS_DeviceDisconnected(void);
   */ 
 #ifdef __cplusplus
   }
-#endif
+#endif /* USBD_USR_H */
 #endif /*__USBD_USR_H__*/
 
 /**

@@ -16,8 +16,8 @@
 
 /* CDC Endpoints parameters: you can fine tune these values depending on the needed baudrates and performance. */
 
- #define CDC_DATA_MAX_PACKET_SIZE       64   /* Endpoint IN & OUT Packet size */
- #define CDC_CMD_PACKET_SZE             8    /* Control Endpoint Packet size */
+#define CDC_DATA_MAX_PACKET_SIZE       64   /* Endpoint IN & OUT Packet size */
+#define CDC_CMD_PACKET_SZE             8    /* Control Endpoint Packet size */
 
 /* Number of frames between IN transfers */
 #define CDC_IN_FRAME_INTERVAL          40 //5
