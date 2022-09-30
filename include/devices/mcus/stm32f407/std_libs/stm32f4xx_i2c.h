@@ -20,8 +20,8 @@
   */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __STM32F4xx_I2C_H
-#define __STM32F4xx_I2C_H
+#ifndef STM32F4XX_I2C_H
+#define STM32F4XX_I2C_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -687,7 +687,7 @@ void I2C_ClearITPendingBit(I2C_TypeDef* I2Cx, uint32_t I2C_IT);
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* STM32F4XX_I2C_H */
 
 #endif /*__STM32F4xx_I2C_H */
 

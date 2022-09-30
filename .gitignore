@@ -17,3 +17,7 @@ build**
 // Cortex-debug plugin generated
 null.d
 **.DS_Store**
+
+// IDEA
+.idea**
+cmake-build-debug**

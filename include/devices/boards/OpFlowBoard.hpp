@@ -17,7 +17,7 @@ public:
    * @param pins_groups array contains GPIO pins' groups, has the length declared by pixel_bit_size
    * @return return 1 if set, otherwise return 0
    */
-  uint8_t getDCMIPins(uint32_t *&pins, uint32_t *&pins_groups);
+  virtual uint8_t get_DCMI_pins(uint16_t *&pins, GPIO_TypeDef *&pins_groups);
 
   /**
    * @brief Return board dcmi pins configuration
@@ -25,7 +25,7 @@ public:
    * @param pixel_bit_size number of bits of each pixel
    * @return return 1 if set, otherwise return 0
    */
-  uint8_t getDCMIPixelBitSize(uint16_t *pixel_bit_size);
+  virtual uint8_t get_DCMI_pixel_bit_size(uint16_t *pixel_bit_size);
 
   /**
    * @brief set pix_clk_pin parameter with board dcmi PIXCLK pin number
@@ -34,7 +34,7 @@ public:
    * @param pix_clk_pin_group pin GPIO group
    * @return uint8_t return 1 if set, otherwise return 0
    */
-  uint8_t getDCMIPixClkPin(uint32_t *pix_clk_pin, uint32_t *pix_clk_pin_group);
+  virtual uint8_t get_DCMI_pixclk_pin(uint16_t *pix_clk_pin, GPIO_TypeDef *&pix_clk_pin_group);
 
   /**
    * @brief set hsync parameter with board dcmi HSYNC pin number
@@ -43,7 +43,25 @@ public:
    * @param hsync_pin_group pin GPIO group
    * @return uint8_t return 1 if set, otherwise return 0
    */
-  uint8_t getDCMIHSyncPin(uint32_t *hsync_pin, uint32_t *hsync_pin_group);
+  virtual uint8_t get_DCMI_hsync_pin(uint16_t *hsync_pin, GPIO_TypeDef *&hsync_pin_group);
+
+  /**
+   * @brief Get the I2C scl pin in the board
+   * 
+   * @param scl_pin scl_pin_address
+   * @param scl_pin_group scl pin group address
+   * @return uint8_t uint8_t return 1 if set, otherwise return 0
+   */
+  virtual uint8_t get_I2C_scl_pin(uint16_t *scl_pin, GPIO_TypeDef *&scl_pin_group, uint8_t *AF_pin, uint8_t *AF_pin_source);
+
+  /**
+   * @brief Get the I2C sda pin in the board
+   * 
+   * @param sda_pin sda_pin_address
+   * @param sda_pin_group sda pin group address
+   * @return uint8_t uint8_t return 1 if set, otherwise return 0
+   */
+  virtual uint8_t get_I2C_sda_pin(uint16_t *sda_pin, GPIO_TypeDef *&sda_pin_group, uint8_t *AF_pin, uint8_t *AF_pin_source);
 };
 
 #endif /* OPFLOWBOARD_H */
