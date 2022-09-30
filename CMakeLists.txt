@@ -51,6 +51,8 @@ include_directories(
     include/DSP_libs
     include/freeRTOS
     include/system
+    include/system/storage
+    include/system/configs
     include/system/usb
     include/system/sensors
 )
