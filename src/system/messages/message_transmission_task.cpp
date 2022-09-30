@@ -157,8 +157,12 @@ uint8_t MessageTransmissionTask::receiveMsgFromBuffer(CircularByteArray *buffer,
   request_message->start_magic_number = START_MAGIC_NUMBER;
   request_message->ending_magic_number = END_MAGIC_NUMBER;
   request_message->message_size = message_size;
+  buffer->peek(2, (uint8_t *)&(request_message->message_version), number_of_bytes_of_msg_initials);
   buffer->peek(4, (uint8_t *)&(request_message->message_id), number_of_bytes_of_msg_initials + 2);
-  buffer->peek(4, (uint8_t *)&(request_message->message_type), number_of_bytes_of_msg_initials + 2 + sizeof(uint32_t));
+  buffer->peek(2, (uint8_t *)&(request_message->message_frame_index), number_of_bytes_of_msg_initials + 2 + sizeof(uint32_t));
+  buffer->peek(2, (uint8_t *)&(request_message->message_total_frame), number_of_bytes_of_msg_initials + 2 + sizeof(uint32_t) + 2);
+  buffer->peek(4, (uint8_t *)&(request_message->message_type), number_of_bytes_of_msg_initials + 2 + sizeof(uint32_t) * 2);
+  
   uint32_t message_byte_length = request_message->getInnerMessageSizeBySubtraction();
   request_message->message = (uint8_t *)pvPortMalloc(message_byte_length);
   buffer->peek(message_byte_length, request_message->message, number_of_bytes_of_msg_initials + 2 + sizeof(uint32_t) * 2);

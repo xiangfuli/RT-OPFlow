@@ -17,6 +17,8 @@ void Message::defaultInit()
   this->message_id = 0;
   this->message_version=1;
   this->message_type = 0;
+  this->message_total_frame = 1;
+  this->message_frame_index = 1;
   this->message = nullptr;
   setWholeMessageSizeWithInnerMessage(0);
 }
@@ -29,6 +31,8 @@ void Message::setWholeMessageSizeWithInnerMessage(uint32_t inner_msg_size)
       + sizeof(this->message_size)
       + sizeof(this->message_type)
       + sizeof(this->message_version)
+      + sizeof(this->message_frame_index)
+      + sizeof(this->message_total_frame)
       + sizeof(this->ending_magic_number);
 }
 
@@ -38,6 +42,8 @@ uint8_t Message::getNumberOfBytesBeforeInnerMessage()
           + sizeof(this->message_id)
           + sizeof(this->message_size)
           + sizeof(this->message_type)
+          + sizeof(this->message_frame_index)
+          + sizeof(this->message_total_frame)
           + sizeof(this->message_version);
 }
 
@@ -49,5 +55,7 @@ uint8_t Message::getInnerMessageSizeBySubtraction()
           - sizeof(this->message_id)
           - sizeof(this->message_size)
           - sizeof(this->message_type)
+          - sizeof(this->message_frame_index)
+          - sizeof(this->message_total_frame)
           - sizeof(this->message_version);
 }

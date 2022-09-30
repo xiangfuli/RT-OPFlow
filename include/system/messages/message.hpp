@@ -15,6 +15,8 @@ public:
   uint16_t message_size;
   uint16_t message_version;
   uint32_t message_id;
+  uint16_t message_frame_index;
+  uint16_t message_total_frame;
   uint32_t message_type;                                      // first 31 bits indicate the message type and the last 1 bit implies if this message is request or response message
   uint8_t *message;
   uint32_t ending_magic_number;
