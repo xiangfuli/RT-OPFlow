@@ -19,8 +19,8 @@
   */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __STM32F4xx_DCMI_H
-#define __STM32F4xx_DCMI_H
+#ifndef STM32F4XX_DCMI_H
+#define STM32F4XX_DCMI_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -290,7 +290,7 @@ void DCMI_ClearITPendingBit(uint16_t DCMI_IT);
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* STM32F4XX_DCMI_H */
 
 #endif /*__STM32F4xx_DCMI_H */
 

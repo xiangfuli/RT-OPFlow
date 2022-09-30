@@ -56,6 +56,7 @@ include_directories(
 )
 
 file(GLOB_RECURSE SOURCES
+        "include/**"
         "src/**"
         )
 
