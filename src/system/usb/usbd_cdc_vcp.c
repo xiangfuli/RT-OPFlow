@@ -219,19 +219,21 @@ void VCP_send_str(uint8_t* buf)
   */
 static uint16_t VCP_DataRx (uint8_t* Buf, uint32_t Len)
 {
-	uint32_t i;
+	// uint32_t i;
 
-	for (i = 0; i < Len; i++)
-	{
-		APP_Tx_Buffer[APP_tx_ptr_head] = *(Buf + i);
-		APP_tx_ptr_head++;
+	// for (i = 0; i < Len; i++)
+	// {
+	// 	APP_Tx_Buffer[APP_tx_ptr_head] = *(Buf + i);
+	// 	APP_tx_ptr_head++;
 
-		if(APP_tx_ptr_head == APP_TX_BUF_SIZE)
-			APP_tx_ptr_head = 0;
+	// 	if(APP_tx_ptr_head == APP_TX_BUF_SIZE)
+	// 		APP_tx_ptr_head = 0;
 
-		if(APP_tx_ptr_head == APP_tx_ptr_tail)
-			return USBD_FAIL;
-	}
+	// 	if(APP_tx_ptr_head == APP_tx_ptr_tail)
+	// 		return USBD_FAIL;
+	// }
+
+  message_manager_receive_usb_data_wrapper(Buf, Len);
 
 	return USBD_OK;
 }
