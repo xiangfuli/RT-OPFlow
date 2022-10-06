@@ -20,8 +20,8 @@ public:
   void send_message(Message *message);
   void start_transmission_task();
   void receive_message_from_usb(uint8_t *buffer, uint32_t len);
+  bool all_message_has_been_sent();
 private:
-  
   void stop_transmission_task();
 
   bool _usb_port_connected;

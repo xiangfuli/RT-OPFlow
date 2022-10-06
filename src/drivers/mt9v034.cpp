@@ -5,16 +5,17 @@ MT9V034::MT9V034(I2CHost *i2c_host):
 _i2c_host(i2c_host),
 _current_buffer_index(0),
 _mode(FLOW_MODE),
-_numbers_of_received_images(0),
-_hr_mode_dma_transmission_times_index(0)
+_initialized(false)
 {
   this->_i2c_host = i2c_host;
 }
 MT9V034::~MT9V034() {
-
 }
 
 uint8_t MT9V034::init(uint8_t *buffer0, uint8_t *buffer1) {
+  this->_dma_buffer_0 = buffer0;
+  this->_dma_buffer_1 = buffer1;
+
   uint8_t init_res = 0;
   init_res = this->sys_clk_init();
   init_res = init_res && this->rst_ctrl_init();
@@ -24,15 +25,14 @@ uint8_t MT9V034::init(uint8_t *buffer0, uint8_t *buffer1) {
   init_res = init_res && this->reset();
 
   // start FLOW_MODE as default
-  init_res = init_res && this->select_mode(FLOW_MODE);
-
   init_res = init_res && this->common_register_init();
 
   init_res = init_res && this->context_register_init();
 
-  this->_dma_buffer_0 = buffer0;
-  this->_dma_buffer_1 = buffer1;
-  
+  init_res = init_res && this->select_mode(FLOW_MODE);
+
+  this->_initialized = true;
+
   return init_res;
 }
 
@@ -79,6 +79,16 @@ uint8_t MT9V034::sys_clk_init() {
 
 	/* TIM3 enable counter */
 	TIM_Cmd(TIM3, ENABLE);
+
+  /* Initialize GPIOs for EXPOSURE and STANDBY lines of the camera */
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2 | GPIO_Pin_3;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	GPIO_Init(GPIOA, &GPIO_InitStructure);
+	GPIO_ResetBits(GPIOA, GPIO_Pin_2 | GPIO_Pin_3);
+
   return 1;
 }
 
@@ -93,6 +103,7 @@ uint8_t MT9V034::rst_ctrl_init() {
   /**
    * @brief initialize RES_CTRL pin 
    */
+  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
   GPIO_InitTypeDef GPIO_InitStructure;
   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
@@ -102,7 +113,7 @@ uint8_t MT9V034::rst_ctrl_init() {
 	GPIO_Init(GPIOD, &GPIO_InitStructure);
 
   // remain RST_CTRL at low
-  // GPIO_SetBits(GPIOD, GPIO_Pin_10);
+  GPIO_ResetBits(GPIOD, GPIO_Pin_10);
 
   return 1;
 }
@@ -127,7 +138,7 @@ uint8_t MT9V034::common_register_init() {
 }
 
 uint8_t MT9V034::context_register_init() {
-  uint8_t res = 0;
+  uint8_t res = 1;
   /**
    * Context A register
    */
@@ -159,17 +170,31 @@ uint8_t MT9V034::context_register_init() {
   return res;
 }
 
-uint8_t MT9V034::select_mode(uint8_t mode) {
-  if (mode == FLOW_MODE) {
-    // switch to context A
-    return this->write_register(MT9V034_CHIP_CONTROL_REGISTER, MT9V034_CHIP_CONTROL_REGISTER_DEFAULT_VALUE);
-  } else {
-    // switch to context B
-    return this->write_register(MT9V034_CHIP_CONTROL_REGISTER, MT9V034_CHIP_CONTROL_REGISTER_DEFAULT_VALUE | 0x8000);
+uint8_t MT9V034::select_mode(MT9V034_mode mode) {
+  if (this->_mode != mode || !this->_initialized) {
+    this->_mode = mode;
+    this->dcmi_dma_disable();
+    this->dcmi_and_dma_init();
+    this->dcmi_dma_enable();
+    this->read_register(0x6B, (uint8_t *)&this->operation_mode);
+    if (mode == FLOW_MODE) {
+      // switch to context A
+      return this->write_register(MT9V034_CHIP_CONTROL_REGISTER, MT9V034_CHIP_CONTROL_REGISTER_DEFAULT_VALUE);
+    } else {
+      // switch to context B
+      return this->write_register(MT9V034_CHIP_CONTROL_REGISTER, MT9V034_CHIP_CONTROL_REGISTER_DEFAULT_VALUE | 0x8000);
+    }
   }
+  
+  return 1;
 }
 
 uint8_t MT9V034::dcmi_pin_init() {
+  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
+  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE);
+
   GPIO_InitTypeDef GPIO_InitStructure;
 
   /* Connect DCMI pins to AF13 */
@@ -212,7 +237,7 @@ uint8_t MT9V034::dcmi_pin_init() {
   return 1;
 }
 
-uint8_t MT9V034::dcmi_dma_init() {
+uint8_t MT9V034::dcmi_and_dma_init() {
   DCMI_InitTypeDef DCMI_InitStructure;
 	DMA_InitTypeDef DMA_InitStructure;
 
@@ -221,13 +246,19 @@ uint8_t MT9V034::dcmi_dma_init() {
 	RCC_AHB2PeriphClockCmd(RCC_AHB2Periph_DCMI, ENABLE);
 
 	/* DCMI configuration */
-	DCMI_InitStructure.DCMI_CaptureMode = DCMI_CaptureMode_Continuous;
+  if (this->_mode == FLOW_MODE) {
+	  DCMI_InitStructure.DCMI_CaptureMode = DCMI_CaptureMode_SnapShot;
+  } else {
+    DCMI_InitStructure.DCMI_CaptureMode = DCMI_CaptureMode_SnapShot;
+  }
 	DCMI_InitStructure.DCMI_SynchroMode = DCMI_SynchroMode_Hardware;
 	DCMI_InitStructure.DCMI_PCKPolarity = DCMI_PCKPolarity_Falling;
 	DCMI_InitStructure.DCMI_VSPolarity = DCMI_VSPolarity_Low;
 	DCMI_InitStructure.DCMI_HSPolarity = DCMI_HSPolarity_Low;
 	DCMI_InitStructure.DCMI_CaptureRate = DCMI_CaptureRate_All_Frame;
-	DCMI_InitStructure.DCMI_ExtendedDataMode = DCMI_ExtendedDataMode_8b;
+	DCMI_InitStructure.DCMI_ExtendedDataMode = DCMI_ExtendedDataMode_10b;
+
+  DCMI_Init(&DCMI_InitStructure);
 
 	/* Configures the DMA2 to transfer Data from DCMI */
 	/* Enable DMA2 clock */
@@ -237,7 +268,7 @@ uint8_t MT9V034::dcmi_dma_init() {
 	DMA_DeInit(DMA2_Stream1);
 
 	DMA_InitStructure.DMA_Channel = DMA_Channel_1;
-	DMA_InitStructure.DMA_PeripheralBaseAddr = DCMI->DR;
+	DMA_InitStructure.DMA_PeripheralBaseAddr = DCMI_DR_ADDRESS;
 	DMA_InitStructure.DMA_Memory0BaseAddr = (uint32_t) this->_dma_buffer_0;
 	DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralToMemory;
 	DMA_InitStructure.DMA_BufferSize = MT9V034_OF_MODE_DMA_BUFFER_SIZE / 4; // buffer size in date unit (word)
@@ -245,66 +276,67 @@ uint8_t MT9V034::dcmi_dma_init() {
 	DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
 	DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Word;
 	DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_Word;
-  if (this->_mode == FLOW_MODE) {
-	  DMA_InitStructure.DMA_Mode = DMA_Mode_Circular;
-  } else if (this->_mode == HR_MODE) {
-    DMA_InitStructure.DMA_Mode = DMA_Mode_Normal;
-  }
+  DMA_InitStructure.DMA_Mode = DMA_Mode_Circular;
 	DMA_InitStructure.DMA_Priority = DMA_Priority_High;
 	DMA_InitStructure.DMA_FIFOMode = DMA_FIFOMode_Disable;
 	DMA_InitStructure.DMA_FIFOThreshold = DMA_FIFOThreshold_Full;
 	DMA_InitStructure.DMA_MemoryBurst = DMA_MemoryBurst_Single;
 	DMA_InitStructure.DMA_PeripheralBurst = DMA_PeripheralBurst_Single;
-
-	DMA_DoubleBufferModeConfig(DMA2_Stream1, (uint32_t) this->_dma_buffer_1, DMA_Memory_0);
-	DMA_DoubleBufferModeCmd(DMA2_Stream1, ENABLE);
-
-	/* DCMI configuration */
-	DCMI_Init(&DCMI_InitStructure);
-
-	/* DMA2 IRQ channel Configuration */
-	DMA_Init(DMA2_Stream1, &DMA_InitStructure);
-
-  /* Enable DMA interrupt*/
+  DMA_Init(DMA2_Stream1, &DMA_InitStructure);
+  
   NVIC_InitTypeDef NVIC_InitStructure;
 
-	/* Enable the DMA global Interrupt */
-	NVIC_InitStructure.NVIC_IRQChannel = DMA2_Stream1_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 5;
+  /* 
+   * Enable DCMI Interrupt 
+   * DCMI interrupt needs to be lower than DMA interrupt
+  */
+	NVIC_InitStructure.NVIC_IRQChannel = DCMI_IRQn;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 2;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);
 
+  NVIC_InitTypeDef NVIC_InitStructure1;
+	NVIC_InitStructure1.NVIC_IRQChannel = DMA2_Stream1_IRQn;
+	NVIC_InitStructure1.NVIC_IRQChannelPreemptionPriority = 0;
+	NVIC_InitStructure1.NVIC_IRQChannelSubPriority = 1;
+	NVIC_InitStructure1.NVIC_IRQChannelCmd = ENABLE;
+	NVIC_Init(&NVIC_InitStructure1);
+
+  return 1;
+}
+
+uint8_t MT9V034::start_image_capture() {
+  DCMI_CaptureCmd(ENABLE);
+  return 1;
+}
+
+uint8_t MT9V034::stop_image_capture() {
+  DCMI_CaptureCmd(DISABLE);
   return 1;
 }
 
 uint8_t MT9V034::dcmi_dma_enable() {
-  DMA_DoubleBufferModeConfig(DMA2_Stream1, (uint32_t) this->_dma_buffer_0, 0);
-  DMA_DoubleBufferModeConfig(DMA2_Stream1, (uint32_t) this->_dma_buffer_1, 1);
-  DMA_Cmd(DMA2_Stream1, ENABLE);
-  DMA_ITConfig(DMA2_Stream1, DMA_IT_HT, ENABLE);
-  DMA_ITConfig(DMA2_Stream1, DMA_IT_TC, ENABLE);
+  DCMI_ITConfig(DCMI_IT_FRAME, ENABLE);
   DCMI_Cmd(ENABLE);
-  this->_hr_mode_dma_transmission_times_index = 0;
-	DCMI_CaptureCmd(ENABLE);
+  DMA_ITConfig(DMA2_Stream1, DMA_IT_TC, ENABLE);
+  DMA_Cmd(DMA2_Stream1, ENABLE);
   return 1;
 }
 
 uint8_t MT9V034::dcmi_dma_disable() {
-  DCMI_CaptureCmd(DISABLE);
   DMA_Cmd(DMA2_Stream1, DISABLE);
-  DMA_ITConfig(DMA2_Stream1, DMA_IT_HT, DISABLE);
-  DMA_ITConfig(DMA2_Stream1, DMA_IT_TC, DISABLE);
+  DMA_ITConfig(DMA2_Stream1, DMA_IT_TC, ENABLE);
+  DCMI_ITConfig(DCMI_IT_FRAME, DISABLE);
 	DCMI_Cmd(DISABLE);
-  this->_hr_mode_dma_transmission_times_index = 0;
   return 1;
 }
 
 uint8_t MT9V034::write_register(uint8_t address, uint16_t value) {
   uint8_t res = 0;
 
-  // because stm32 is little edian, so before sending the byte
-  // we have to put the least significant byte at index 0.
+  /** because stm32 is little edian, so before sending the byte
+      we have to put the least significant byte at index 0. **/
   uint8_t bytes_to_be_sent[2];
   bytes_to_be_sent[0] = value >> 8;
   bytes_to_be_sent[1] = value & 0x00FF;
@@ -328,22 +360,4 @@ uint8_t MT9V034::read_register(uint8_t address, uint8_t *value) {
   uint8_t res = 0;
   res = this->_i2c_host->read(MT9V034_I2C_DEVICE_ADDRESS, address, value, 2);
   return res;
-}
-
-uint8_t MT9V034::dcmi_dma_it_handler() {
-  // handle the transfer completion flag
-  if (DMA_GetITStatus(DMA2_Stream1, DMA_IT_HTIF1) == SET) {
-		DMA_ClearITPendingBit(DMA2_Stream1, DMA_IT_HTIF1);
-	} else if (DMA_GetITStatus(DMA2_Stream1, DMA_IT_TCIF1) == SET) {
-    this->_hr_mode_dma_transmission_times_index++;
-    DMA_ClearITPendingBit(DMA2_Stream1, DMA_IT_HTIF1);
-  }
-}
-
-uint32_t MT9V034::get_numbers_of_received_images() {
-  return this->_numbers_of_received_images;
-}
-
-void MT9V034_DCMI_DMA_it_callback(MT9V034 *mt9v034) {
-  mt9v034->dcmi_dma_it_handler();
 }

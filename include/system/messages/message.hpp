@@ -24,8 +24,7 @@ public:
   void defaultInit();
   void setWholeMessageSizeWithInnerMessage(uint32_t inner_msg_size);
   uint8_t getNumberOfBytesBeforeInnerMessage();
-  uint8_t getInnerMessageSizeBySubtraction();
-
+  uint32_t getInnerMessageSizeBySubtraction();
 };
 
 #endif /* MESSAGE_H */

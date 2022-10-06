@@ -9,6 +9,7 @@ public:
   Message *message;
   uint8_t processed;
   MessageListNode *next;
+  bool need_to_free_message_bytes;
 public:
   MessageListNode();
   ~MessageListNode();

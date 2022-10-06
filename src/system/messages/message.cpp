@@ -47,7 +47,7 @@ uint8_t Message::getNumberOfBytesBeforeInnerMessage()
           + sizeof(this->message_version);
 }
 
-uint8_t Message::getInnerMessageSizeBySubtraction()
+uint32_t Message::getInnerMessageSizeBySubtraction()
 {
   return this->message_size
           - sizeof(this->start_magic_number)

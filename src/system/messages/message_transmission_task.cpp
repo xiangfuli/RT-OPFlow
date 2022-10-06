@@ -23,26 +23,30 @@ uint8_t MessageTransmissionTask::get_next_bytes_to_be_sent(Message *message, uin
     *len = message->message_size;
     return 1;
   } else {
-    if (already_sent_bytes_number > message->message_size) {
+    if (already_sent_bytes_number < message->message_size) {
       if (already_sent_bytes_number + 64 >= message->message_size) {
         // last several bytes need to be sent
-        *len = message->message_size - already_sent_bytes_number - ending_magic_number_size;
+        *len = message->message_size - already_sent_bytes_number;
         memcpy(bytes_to_be_sent_buffer, 
           message->message + already_sent_bytes_number - message->getNumberOfBytesBeforeInnerMessage(), 
-          *len);
+          *len - ending_magic_number_size);
+        memcpy(bytes_to_be_sent_buffer + *len - ending_magic_number_size,
+          &message->ending_magic_number,
+          ending_magic_number_size);
+        return 1;
       } else {
         // have to split the message into packages
         if (already_sent_bytes_number == 0) {
           memcpy(bytes_to_be_sent_buffer, &message->start_magic_number, message->getNumberOfBytesBeforeInnerMessage());
           memcpy(bytes_to_be_sent_buffer + message->getNumberOfBytesBeforeInnerMessage(),
             message->message, 
-            USBD_SINGLE_PAC_MAX_SIZE - message->getInnerMessageSizeBySubtraction());
+            USBD_SINGLE_PAC_MAX_SIZE - message->getNumberOfBytesBeforeInnerMessage());
           *len = USBD_SINGLE_PAC_MAX_SIZE;
           return 1;
         } else {
           // inner message size is too large to be sent once in 64 bytes packet
-          memcpy(bytes_to_be_sent_buffer, &message->message, 64);
-          *len = 64;
+          memcpy(bytes_to_be_sent_buffer, message->message + already_sent_bytes_number, 64);
+          *len = USBD_SINGLE_PAC_MAX_SIZE;
           return 1;
         }
       }
@@ -68,9 +72,6 @@ void MessageTransmissionTask::start_transmission() {
           for (int i=0; i<bytes_number; i++) {
             VCP_put_char(bytes_buffer[i]);
           }
-          if (bytes_already_sent == request_message->message_size) {
-            this->_message_center->_message_list_header->processed = 1;
-          }
         }
       }
     } else if (this->_message_center->_message_list_header->processed == 1 
@@ -79,6 +80,9 @@ void MessageTransmissionTask::start_transmission() {
       MessageListNode *temp = this->_message_center->_message_list_header;
       this->_message_center->_message_list_header = this->_message_center->_message_list_header->next;
       delete temp;
+    }
+    if (bytes_already_sent == this->_message_center->_message_list_header->message->message_size) {
+      this->_message_center->_message_list_header->processed = 1;
     }
 
     // data reception
@@ -162,10 +166,9 @@ uint8_t MessageTransmissionTask::receiveMsgFromBuffer(CircularByteArray *buffer,
   buffer->peek(2, (uint8_t *)&(request_message->message_frame_index), number_of_bytes_of_msg_initials + 2 + sizeof(uint32_t));
   buffer->peek(2, (uint8_t *)&(request_message->message_total_frame), number_of_bytes_of_msg_initials + 2 + sizeof(uint32_t) + 2);
   buffer->peek(4, (uint8_t *)&(request_message->message_type), number_of_bytes_of_msg_initials + 2 + sizeof(uint32_t) * 2);
-  
   uint32_t message_byte_length = request_message->getInnerMessageSizeBySubtraction();
   request_message->message = (uint8_t *)pvPortMalloc(message_byte_length);
-  buffer->peek(message_byte_length, request_message->message, number_of_bytes_of_msg_initials + 2 + sizeof(uint32_t) * 2);
+  buffer->peek(message_byte_length, request_message->message, number_of_bytes_of_msg_initials + 2 + sizeof(uint32_t) * 3);
   buffer->remove(message_size);
 
   return 1;

@@ -5,11 +5,12 @@ MessageListNode::MessageListNode()
   this->message = nullptr;
   this->next = nullptr;
   this->processed = 0;
+  this->need_to_free_message_bytes = false;
 }
 
 MessageListNode::~MessageListNode()
 {
-  if (this->message->message) {
+  if (this->need_to_free_message_bytes) {
     delete this->message->message;
   }
   delete this->message;

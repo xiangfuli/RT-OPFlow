@@ -21,6 +21,7 @@
 #include "storage_manager.hpp"
 #include "sensor_manager.hpp"
 #include "message_manager.hpp"
+#include "sensor_message_agent.hpp"
 
 /**
  * @brief Interrupt handlers
@@ -29,7 +30,8 @@
 
 extern "C" {
   void I2C2_ER_IRQHandler();
-  void DMA2_Stream1_IRQHander(void);
+  void DMA2_Stream1_IRQHandler(void);
+  void DCMI_IRQHandler(void);
   void message_manager_receive_usb_data_wrapper(uint8_t *buffer, uint32_t len);
 }
 

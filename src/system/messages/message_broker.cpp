@@ -10,6 +10,8 @@ MessageBroker::MessageBroker()
   }
 }
 
+MessageBroker::~MessageBroker() {}
+
 uint8_t MessageBroker::getBuckIndex(uint32_t message_type)
 {
   return (uint8_t) (message_type & CONSUMER_FUNCTION_BUCK_SIZE);
@@ -46,7 +48,7 @@ uint8_t MessageBroker::process(Message *request_message, Message* response_messa
   // find the mapped callback function
   while(func_node->agent) {
       if (func_node->message_type == request_message->message_type) {
-        response_result = func_node->agent->callbackFunc(request_message, response_message);
+        response_result = func_node->agent->callback_func(request_message, response_message);
         break;
       }
       func_node = func_node->next;

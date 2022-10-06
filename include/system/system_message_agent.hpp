@@ -14,9 +14,9 @@ public:
   SystemMessageAgent(MessageManager *message_manager);
   ~SystemMessageAgent();
 
-  uint8_t callbackFunc(Message *request_message, Message* response_message);
-  uint8_t send_message(Message *request_message);
-  uint8_t comConnected();
+  uint8_t callback_func(Message *request_message, Message* response_message);
+  void send_message(Message *request_message);
+  uint8_t com_connected();
 
 private:
   MessageManager *_message_manager;

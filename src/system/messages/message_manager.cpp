@@ -3,20 +3,27 @@
 MessageManager::MessageManager():
 _usb_port_connected(false)
 {
-}
-
-MessageManager::~MessageManager() {
-
-}
-
-uint8_t MessageManager::init() {
   this->_message_broker = new MessageBroker();
   this->_message_center = new MessageCenter();
   this->_transmission_task = new MessageTransmissionTask(
     this->_message_center,
     this->_message_broker
   );
+}
+
+MessageManager::~MessageManager() {
+  delete this->_message_broker;
+  delete this->_message_center;
+  delete this->_transmission_task;
+}
+
+uint8_t MessageManager::init() {
   return 1;
+}
+
+bool MessageManager::all_message_has_been_sent() {
+  return this->_message_center->_message_list_header->processed == 1 
+    &&  this->_message_center->_message_list_header->next == nullptr;
 }
 
 uint8_t MessageManager::register_message_agent(uint32_t message_type, MessageAgent *agent) {
