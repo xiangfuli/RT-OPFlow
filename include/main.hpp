@@ -11,13 +11,6 @@
 #include "OpFlowBoardAlpha.hpp"
 #include "system_manager.hpp"
 
-// #include "optical_flow.hpp"
-
-/**
- * @brief Interrupt handlers
- * 
- */
-
 extern "C" {
   void I2C2_ER_IRQHandler();
   void DMA2_Stream1_IRQHandler(void);
