@@ -47,6 +47,21 @@ uint8_t SensorManager::start_camera_capture() {
   return 1;
 }
 
+void SensorManager::request_latest_image_buffer_under_flow_mode(uint8_t *buffer) {
+  if (this->_mode == FLOW_MODE) {
+    this->_request_latest_image_frame_buffer = buffer;
+    this->_request_latest_image_frame = true;
+    this->_latest_frame_arrived = false;
+
+    while (!this->_latest_frame_arrived) {
+      this->_latest_frame_arrived = false;
+    }
+
+    this->_request_latest_image_frame = false;
+    this->_latest_frame_arrived = true;
+  }
+}
+
 uint8_t SensorManager::request_image_frame_under_hr_mode(uint32_t frame_index) {
   this->_hr_mode_request_frame_index = frame_index;
   this->_hr_mode_dma_transmission_times_index = 0;
@@ -64,8 +79,11 @@ void sensor_manager_dcmi_it_handler(SensorManager *sensor_manager) {
     /**
      * Clear the frame index used in the HR mode.
      */
-    if (sensor_manager->get_camera_opration_mode() == HR_MODE && sensor_manager->_hr_mode_dma_transmission_times_index < sensor_manager->_hr_mode_request_frame_index) {
+    if (sensor_manager->get_camera_opration_mode() == HR_MODE 
+        && sensor_manager->_hr_mode_dma_transmission_times_index < sensor_manager->_hr_mode_request_frame_index) {
       sensor_manager->start_camera_capture();
+    } else if (sensor_manager->get_camera_opration_mode() == FLOW_MODE) {
+      
     }
 	}
 }
@@ -91,12 +109,10 @@ void sensor_manager_dcmi_dma_it_handler(SensorManager *sensor_manager) {
         sensor_manager->_message_manager->send_message(message);
       }
     } else if (sensor_manager->get_camera_opration_mode() == FLOW_MODE) {
-      Message *message = new Message();
-      message->defaultInit();
-      message->message_type = OPFLOW_MESSAGE_TYPE_GET_IMAGE_REQUEST_RESPONSE;
-      message->message = mt9v034_buffer_0;
-      message->setWholeMessageSizeWithInnerMessage(MT9V034_HR_MODE_DMA_BUFFER_SIZE);
-      sensor_manager->_message_manager->send_message(message);
+      if (sensor_manager->_request_latest_image_frame) {
+        memcpy(sensor_manager->_request_latest_image_frame_buffer, mt9v034_buffer_0, MT9V034_OF_MODE_DMA_BUFFER_SIZE);
+        sensor_manager->_latest_frame_arrived = true;
+      }
     }
 
     DMA_ClearITPendingBit(DMA2_Stream1, DMA_IT_TCIF1);

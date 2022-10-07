@@ -5,21 +5,20 @@
 #include "stm32f4xx.h"
 #include "arm_math.h"
 
-using namespace std;
 
 class BlockMatcher {
-public:
-  uint32_t _win_size, _img_height, _img_width;
+  public:
+    int win_size_,img_height_, img_width_;
 
-  BlockMatcher(uint32_t win_size, uint32_t img_height, uint32_t img_width);
+    BlockMatcher(int win_size, int img_height, int img_width);
 
-  virtual int32_t match(
+    virtual int match(
     uint8_t *&pre_img,
     uint8_t *&cur_img,
-    uint32_t &pre_row,
-    uint32_t &pre_col,
-    uint32_t &cur_row,
-    uint32_t &cur_col) = 0;
+        int &pre_row,
+        int &pre_col,
+        int &cur_row,
+        int &cur_col) = 0;
 };
 
 #endif /* BLOCK_MATCH_H */

@@ -11,9 +11,14 @@ void system_task_update_led_according_to_system_state(void *pvParameters) {
   static_cast<SystemManager *>(pvParameters)->task_update_led_according_to_system_state();
 }
 
+void system_task_cal_optical_flow(void *pvParameters) {
+  static_cast<SystemManager *>(pvParameters)->task_cal_optical_flow_shift();
+}
+
 __ALIGN_BEGIN USB_OTG_CORE_HANDLE  USB_OTG_dev __ALIGN_END;
 
-SystemManager::SystemManager(OpFlowBoard *board) {
+SystemManager::SystemManager(OpFlowBoard *board):
+_last_evaluated_image_frame_time(0) {
   this->_i2c_host = new I2CHost(board);
   this->_message_manager = new MessageManager();
   this->_storage_manager = new StorageManager(this->_i2c_host);
@@ -22,7 +27,11 @@ SystemManager::SystemManager(OpFlowBoard *board) {
   this->_sensor_message_agent = new SensorMessageAgent(this->_message_manager, this->_sensor_manager);
   this->_system_message_agent = new SystemMessageAgent(this->_message_manager);
 
-  this->_optiocal_flow = new OpticalFlow(MT9V034_CAMERA_FULL_HEIGHT/4, MT9V034_CAMERA_FULL_WIDTH/4, 17, 20, SSD_BLOCK_MATCH);
+  this->_optiocal_flow = new OpticalFlow(MT9V034_CAMERA_FULL_HEIGHT/4, MT9V034_CAMERA_FULL_WIDTH/4, 
+    9, 
+    30,
+    // MT9V034_CAMERA_FULL_HEIGHT * MT9V034_CAMERA_FULL_WIDTH / 16 / 6, 
+    SSD_BLOCK_MATCH);
 }
 
 SystemManager::~SystemManager() {}
@@ -47,8 +56,8 @@ uint8_t SystemManager::init() {
 
     this->_message_manager->start_transmission_task();
     this->_storage_manager->task_start();
-    
-    this->_sensor_manager->select_camera_operation_mode(HR_MODE);
+
+    this->_sensor_manager->start_camera_capture();
   }
 
   /* init usb */
@@ -95,14 +104,46 @@ void SystemManager::tasks_start() {
   );
   if (this->_system_state == RUNNING) {
     xTaskCreate(
-    system_task_lifecounting_wrapper,
-    "system_lifetime_counting",
-    configMINIMAL_STACK_SIZE,
-    this, 
-    configMAX_PRIORITIES, 
-    NULL
-  );
+      system_task_lifecounting_wrapper,
+      "system_lifetime_counting",
+      configMINIMAL_STACK_SIZE,
+      this, 
+      configMAX_PRIORITIES, 
+      NULL
+    );
+    xTaskCreate(
+      system_task_cal_optical_flow,
+      "system_task_cal_optical_flow",
+      configMINIMAL_STACK_SIZE,
+      this, 
+      configMAX_PRIORITIES, 
+      NULL
+    );
   }
+}
+
+void SystemManager::task_cal_optical_flow_shift() {
+  while(1) {
+    this->_sensor_manager->request_latest_image_buffer_under_flow_mode(latest_image);
+    
+    if (this->_last_evaluated_image_frame_time == 0) {
+      memcpy(previous_image, latest_image, MT9V034_OF_MODE_DMA_BUFFER_SIZE);
+    } else {
+      this->_last_evaluated_image_frame_time = xTaskGetTickCount();
+      this->_optiocal_flow->calFlow(
+        previous_image,
+        latest_image,
+        this->_optical_flow_mean_shift_x,
+        this->_optical_flow_mean_shift_y
+      );
+      this->_last_evaluated_image_frame_time = xTaskGetTickCount();
+
+      memcpy(previous_image, latest_image, MT9V034_OF_MODE_DMA_BUFFER_SIZE);
+    }
+
+    this->_last_evaluated_image_frame_time = xTaskGetTickCount();
+  }
+  this->_last_evaluated_image_frame_time = xTaskGetTickCount();
 }
 
 void SystemManager::task_update_led_according_to_system_state() {

@@ -32,6 +32,7 @@ public:
 
   void task_lifetime_counting();
   void task_update_led_according_to_system_state();
+  void task_cal_optical_flow_shift();
 
 private:
   void increase_launch_times();
@@ -55,6 +56,8 @@ private:
   StorageManager *_storage_manager;
 
   OpticalFlow *_optiocal_flow;
+  float32_t _optical_flow_mean_shift_x, _optical_flow_mean_shift_y;
+  uint32_t _last_evaluated_image_frame_time;
 
   // system state
   SystemState _system_state;

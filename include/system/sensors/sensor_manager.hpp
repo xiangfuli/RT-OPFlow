@@ -19,6 +19,7 @@ public:
   uint8_t start_camera_capture();
   uint8_t select_camera_operation_mode(SystemOperationMode mode);
   uint8_t request_image_frame_under_hr_mode(uint32_t frame_index);
+  void request_latest_image_buffer_under_flow_mode(uint8_t *buffer);
 
   MT9V034 *get_mt9v034();
   SystemOperationMode get_camera_opration_mode();
@@ -28,14 +29,14 @@ public:
   uint32_t _hr_mode_dma_transmission_times_index;
   MessageManager *_message_manager;
   
-  uint32_t _latest_frame_arrvied_timestamp_under_flow_mode;
+  volatile bool _request_latest_image_frame;
+  volatile bool _latest_frame_arrived;
+  uint8_t* _request_latest_image_frame_buffer;
 
 private:
   I2CHost *_i2c_host;
   MT9V034 *_mt9v034;
   SystemOperationMode _mode;
-  
-  
 };
 
 extern "C" {

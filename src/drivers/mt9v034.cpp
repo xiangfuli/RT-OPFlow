@@ -247,7 +247,7 @@ uint8_t MT9V034::dcmi_and_dma_init() {
 
 	/* DCMI configuration */
   if (this->_mode == FLOW_MODE) {
-	  DCMI_InitStructure.DCMI_CaptureMode = DCMI_CaptureMode_SnapShot;
+	  DCMI_InitStructure.DCMI_CaptureMode = DCMI_CaptureMode_Continuous;
   } else {
     DCMI_InitStructure.DCMI_CaptureMode = DCMI_CaptureMode_SnapShot;
   }
@@ -267,6 +267,9 @@ uint8_t MT9V034::dcmi_and_dma_init() {
 	/* DMA2 Stream1 Configuration */
 	DMA_DeInit(DMA2_Stream1);
 
+  /**
+   * For now, always using single dma buffer mode to retrive image bytes
+   */
 	DMA_InitStructure.DMA_Channel = DMA_Channel_1;
 	DMA_InitStructure.DMA_PeripheralBaseAddr = DCMI_DR_ADDRESS;
 	DMA_InitStructure.DMA_Memory0BaseAddr = (uint32_t) this->_dma_buffer_0;
