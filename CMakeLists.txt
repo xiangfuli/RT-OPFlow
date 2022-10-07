@@ -16,8 +16,8 @@ SET(ST_LINK st-flash)
 
 # project SETtings
 project(RT_OPFlow C CXX ASM)
-SET(CMAKE_CXX_STANDARD 17)
-SET(CMAKE_C_STANDARD 99)
+SET(CMAKE_CXX_STANDARD 14)
+SET(CMAKE_C_STANDARD 11)
 
 
 # uncomment to mitigate c++17 absolute addresses warnings
@@ -51,6 +51,7 @@ include_directories(
     include/DSP_libs
     include/freeRTOS
     include/system
+    include/system/flow
     include/system/storage
     include/system/configs
     include/system/messages
@@ -86,7 +87,7 @@ add_compile_options(-mfloat-abi=hard -mfpu=fpv4-sp-d16)
 add_link_options(-mfloat-abi=hard -mfpu=fpv4-sp-d16)
 
 # enable arm math DSP libs support
-add_compile_definitions(ARM_MATH_CM4)
+add_compile_definitions(ARM_MATH_CM4;ARM_MATH_ROUNDING;_GLIBCXX_INCLUDE_NEXT_C_HEADERS)
 
 # enable arm std peripheral libs support
 add_compile_definitions(USE_STDPERIPH_DRIVER)
@@ -97,7 +98,7 @@ add_compile_definitions(STM32F40_41xxx)
 # specify compiler target
 add_compile_definitions(__GNUC__)
 
-add_compile_definitions(D__VFP_FP__)
+add_compile_definitions(__VFP_FP__)
 
 add_executable(${PROJECT_NAME}.elf ${SOURCES} ${LINKER_SCRIPT})
 

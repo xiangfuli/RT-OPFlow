@@ -27,11 +27,14 @@ public:
   uint32_t _hr_mode_request_frame_index;
   uint32_t _hr_mode_dma_transmission_times_index;
   MessageManager *_message_manager;
+  
+  uint32_t _latest_frame_arrvied_timestamp_under_flow_mode;
 
 private:
   I2CHost *_i2c_host;
   MT9V034 *_mt9v034;
   MT9V034_mode _mode;
+  
   
 };
 

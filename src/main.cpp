@@ -20,7 +20,8 @@ void operator delete[](void *p){
 
 uint8_t number_of_devices = 1;
 uint8_t *i2c_device_address;
-
+uint8_t previous_image[(MT9V034_CAMERA_FULL_HEIGHT / 4) * (MT9V034_CAMERA_FULL_WIDTH / 4)] 	__attribute__((section(".ccmram")));
+uint8_t latest_image[(MT9V034_CAMERA_FULL_HEIGHT / 4) * (MT9V034_CAMERA_FULL_WIDTH / 4)] 	 	__attribute__((section(".ccmram")));
 
 OpFlowBoardAlpha board;
 I2CHost i2c_host(&board);
@@ -30,6 +31,7 @@ ConfigManager config_manager(&storage_manager);
 SystemManager system_manager(&config_manager, &message_manager);
 SensorManager sensor_manager(&i2c_host, &message_manager);
 SensorMessageAgent sensor_message_agent(&message_manager, &sensor_manager);
+// OpticalFlow flow(MT9V034_CAMERA_FULL_HEIGHT / 4, MT9V034_CAMERA_FULL_WIDTH / 4, 17, 20, SSD_BLOCK_MATCH);
 
 
 uint8_t initialization_res;
@@ -100,6 +102,9 @@ int main(void) {
 		&USR_desc,
 		&USBD_CDC_cb,
 		&USR_cb);
+	
+	previous_image[0] = 1;
+	latest_image[0] = 1;
 
 	xTaskCreate(pvFCSTaskPowerLEDBlink, "pvFCSTaskPowerLEDBlink", configMINIMAL_STACK_SIZE, NULL, configMAX_PRIORITIES, NULL);
 	vTaskStartScheduler();
