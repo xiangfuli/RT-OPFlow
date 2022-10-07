@@ -5,22 +5,12 @@
 #include "stm32f4xx_gpio.h"
 #include "FreeRTOS.h"
 #include "task.h"
-#include "usbd_core.h"
-#include "usbd_cdc_core.h"
-#include "usbd_desc.h"
-#include "usbd_cdc_vcp.h"
-#include "usbd_usr.h"
 
 #include "i2c_host.hpp"
 
-#include "OpFlowBoard.hpp"
 #include "OpFlowBoardAlpha.hpp"
 #include "system_manager.hpp"
-#include "config_manager.hpp"
-#include "storage_manager.hpp"
-#include "sensor_manager.hpp"
-#include "message_manager.hpp"
-#include "sensor_message_agent.hpp"
+
 // #include "optical_flow.hpp"
 
 /**

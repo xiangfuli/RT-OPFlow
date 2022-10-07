@@ -17,11 +17,11 @@ public:
 
   uint8_t init();
   uint8_t start_camera_capture();
-  uint8_t select_camera_operation_mode(MT9V034_mode mode);
+  uint8_t select_camera_operation_mode(SystemOperationMode mode);
   uint8_t request_image_frame_under_hr_mode(uint32_t frame_index);
 
   MT9V034 *get_mt9v034();
-  MT9V034_mode get_camera_opration_mode();
+  SystemOperationMode get_camera_opration_mode();
 
   uint32_t _numbers_of_received_images;
   uint32_t _hr_mode_request_frame_index;
@@ -33,7 +33,7 @@ public:
 private:
   I2CHost *_i2c_host;
   MT9V034 *_mt9v034;
-  MT9V034_mode _mode;
+  SystemOperationMode _mode;
   
   
 };

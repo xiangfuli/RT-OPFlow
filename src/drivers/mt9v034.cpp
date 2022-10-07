@@ -133,7 +133,7 @@ uint8_t MT9V034::common_register_init() {
   res = res && this->write_register(MT9V034_ADC_COMPANDING_MODE_REGISTER, MT9V034_ADC_COMPANDING_MODE_REGISTER_DEFAULT_VALUE);
 
   // reset register
-  res = this->write_register(0x0C, 0x0001);
+  res = res && this->write_register(0x0C, 0x0001);
   return res;
 }
 
@@ -170,7 +170,7 @@ uint8_t MT9V034::context_register_init() {
   return res;
 }
 
-uint8_t MT9V034::select_mode(MT9V034_mode mode) {
+uint8_t MT9V034::select_mode(SystemOperationMode mode) {
   if (this->_mode != mode || !this->_initialized) {
     this->_mode = mode;
     this->dcmi_dma_disable();

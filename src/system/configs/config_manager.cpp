@@ -33,9 +33,9 @@ uint8_t ConfigManager::init() {
     this->_storage_manager->flush_configs(1);
   }
 
-  this->load_cofigs();
+  res = res & this->load_cofigs();
 
-  return 1;
+  return res;
 }
 
 void ConfigManager::create_config(uint16_t address, uint8_t value, bool persistent, ConfigOption *&config) {

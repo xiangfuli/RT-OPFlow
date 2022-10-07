@@ -4,7 +4,7 @@
 #include "stm32f4xx.h"
 #include "i2c_host.hpp"
 #include "commons.h"
-
+#include "system_defs.hpp"
 
 #define MT9V034_I2C_DEVICE_ADDRESS                               0x48
 /**
@@ -92,11 +92,6 @@
 
 #define DCMI_DR_ADDRESS       0x50050028
 
-typedef enum {
-  HR_MODE,
-  FLOW_MODE
-} MT9V034_mode;
-
 class MT9V034 {
 public:
   MT9V034(I2CHost *i2c_host);
@@ -106,7 +101,7 @@ public:
 
   uint8_t start_image_capture();
   uint8_t stop_image_capture();
-  uint8_t select_mode(MT9V034_mode mode);
+  uint8_t select_mode(SystemOperationMode mode);
 
   uint8_t _common_register_inited;
 
@@ -141,7 +136,7 @@ private:
   uint8_t write_register(uint8_t address, uint16_t value);
   uint8_t read_register(uint8_t address, uint8_t *value);
 
-  MT9V034_mode _mode;
+  SystemOperationMode _mode;
   I2CHost *_i2c_host;
 
   bool _initialized;

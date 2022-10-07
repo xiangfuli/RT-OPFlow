@@ -24,7 +24,7 @@ uint8_t SensorManager::init() {
   return res;
 }
 
-uint8_t SensorManager::select_camera_operation_mode(MT9V034_mode mode) {
+uint8_t SensorManager::select_camera_operation_mode(SystemOperationMode mode) {
   if (this->_mode != mode) {
     this->_numbers_of_received_images = 0;
     this->_hr_mode_dma_transmission_times_index = 0;
@@ -38,7 +38,7 @@ MT9V034 *SensorManager::get_mt9v034() {
   return this->_mt9v034;
 }
 
-MT9V034_mode SensorManager::get_camera_opration_mode() {
+SystemOperationMode SensorManager::get_camera_opration_mode() {
   return this->_mode;
 }
 
