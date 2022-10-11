@@ -67,7 +67,7 @@ file(GLOB_RECURSE SOURCES
 
 add_definitions(-DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -DARM_MATH_CM4 -D__VFP_FP__)
 
-SET(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/compiles_files/STM32F407VGTx_FLASH.ld)
+SET(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/compile_files/STM32F407VGTx_FLASH.ld)
 
 add_link_options(-Wl,-gc-sections,--print-memory-usage,-Map=${PROJECT_BINARY_DIR}/${PROJECT_NAME}.map)
 add_link_options(-mcpu=cortex-m4 -mthumb -mthumb-interwork)
