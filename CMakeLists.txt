@@ -42,9 +42,9 @@ include_directories(
     include/commons
     include/devices/boards
     include/devices/boards/rt-opflow-v1
-    include/devices/mcus/STM32F407/boot
-    include/devices/mcus/STM32F407/freeRTOS_port
-    include/devices/mcus/STM32F407/std_libs
+    include/devices/mcus/STM32F4/boot
+    include/devices/mcus/STM32F4/freeRTOS_port
+    include/devices/mcus/STM32F4/std_libs
     include/drivers
     include/drivers/stm32_usbd
     include/drivers/stm32_usbotg
@@ -64,7 +64,7 @@ file(GLOB_RECURSE SOURCES
         "src/**"
         )
 
-add_definitions(-DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -DARM_MATH_CM4 -D__VFP_FP__ -D__GNUC__)
+add_definitions(-DUSE_STDPERIPH_DRIVER -DSTM32F40_41xxx -DARM_MATH_CM4 -D__VFP_FP__)
 
 SET(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/STM32F407VGTx_FLASH.ld)
 
@@ -77,9 +77,9 @@ SET(HEX_FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.hex)
 SET(BIN_FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.bin)
 
 # enable float support in snprintf
-SET(NO_SYS_LIB_FLOAGS "-specs=nosys.specs -specs=nano.specs")
+SET(NO_SYS_LIB_FLAGS "-specs=nosys.specs -specs=nano.specs")
 SET(COMMON_FLAGS "-u _printf_float -u _scanf_float")
-SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${COMMON_FLAGS} ${NO_SYS_LIB_FLOAGS}")
+SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${COMMON_FLAGS} ${NO_SYS_LIB_FLAGS}")
 
 # enable fpu support
 add_compile_options(-mcpu=cortex-m4 -mthumb -mthumb-interwork)
@@ -94,9 +94,6 @@ add_compile_definitions(USE_STDPERIPH_DRIVER)
 
 # specify chip selection
 add_compile_definitions(STM32F40_41xxx)
-
-# specify compiler target
-add_compile_definitions(__GNUC__)
 
 add_compile_definitions(__VFP_FP__)
 
