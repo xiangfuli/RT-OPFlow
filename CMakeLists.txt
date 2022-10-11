@@ -50,7 +50,7 @@ include_directories(
     include/drivers/stm32_usbotg
     include/DSP_libs
     include/freeRTOS
-    include/freeRTOS/freeRTOS_port
+    include/freeRTOS/freeRTOS_port/gcc
     include/system
     include/system/flow
     include/system/storage
