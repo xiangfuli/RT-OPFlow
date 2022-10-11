@@ -42,14 +42,15 @@ include_directories(
     include/commons
     include/devices/boards
     include/devices/boards/rt-opflow-v1
+    include/devices/mcus/STM32F4
     include/devices/mcus/STM32F4/boot
-    include/devices/mcus/STM32F4/freeRTOS_port
     include/devices/mcus/STM32F4/std_libs
     include/drivers
     include/drivers/stm32_usbd
     include/drivers/stm32_usbotg
     include/DSP_libs
     include/freeRTOS
+    include/freeRTOS/freeRTOS_port
     include/system
     include/system/flow
     include/system/storage
